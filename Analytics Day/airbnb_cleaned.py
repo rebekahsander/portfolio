@@ -126,18 +126,11 @@ airbnb_test.to_csv('airbnb_test.csv', index=False)
 #%%
 # Individual scatterplots
 for feature in X_train.columns:
-    plt.scatter(airbnb[feature], airbnb['relative_revenue'])
+    plt.scatter(airbnb_train[feature], airbnb_train['relative_revenue'])
     plt.xlabel(feature)
     plt.ylabel('Relative Revenue')
     plt.title(f'Scatter plot of {feature} vs. Relative Revenue')
     plt.show()
- 
-#residual scatterplot
-while feature in airbnb_train.columns:
-    sns.residplot(x=feature, y='relative_revenue', data=airbnb_train)
-    plt.xlabel(feature)
-    plt.show()
-
 
 # Correlation matrix
 correlation_matrix = airbnb_train.corr()
@@ -145,6 +138,8 @@ correlation_matrix = airbnb_train.corr()
 # Scatterplot matrix
 sns.pairplot(airbnb_train)
 plt.show()
+
+
 
 #%%
 
@@ -154,6 +149,34 @@ X = sm.add_constant(X)
 # Fit the multiple linear regression model
 model = sm.OLS(y_train, X_train)
 results = model.fit()
+
+observed_values = y_train
+predicted_values = results.predict(X_train)
+
+# Calculate residuals
+residuals = observed_values - predicted_values
+
+# Plot residuals vs. fitted values
+plt.scatter(predicted_values, residuals)
+plt.xlabel('Fitted Values')
+plt.ylabel('Residuals')
+plt.title('Figure 1: Residuals vs. Fitted Values Plot')
+plt.show()
+
+#QQplot of residuals
+fig = sm.qqplot(residuals, line ='45')
+plt.title('Normal Q-Q Plot of Residuals')
+plt.show()
+
+# Plot actual vs. predicted values
+plt.figure(figsize=(8, 6))
+plt.scatter(observed_values, predicted_values, color='blue', alpha=0.4)
+plt.plot([observed_values.min(), observed_values.max()], [predicted_values.min(), predicted_values.max()])  # Add diagonal line for reference
+plt.title('Figure 2: Actual vs. Predicted Values')
+plt.xlabel('Actual Values')
+plt.ylabel('Predicted Values')
+plt.grid(True)
+plt.show()
 
 # Print the summary of the regression results
 print(results.summary())
